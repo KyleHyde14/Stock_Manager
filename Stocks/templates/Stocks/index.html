@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script src="https://kit.fontawesome.com/27011660c1.js" crossorigin="anonymous"></script>
+    <title>{{user}} Stores</title>
+</head>
+<body>
+    <nav id="navbar">
+        <h1 class="nav-title"><a href="/"><i class="fa-solid fa-box"></i> Stock Manager</a></h1>
+        <ul>
+            <li><a href="{% url 'products' user_id=user.id %}"><i class="fa-solid fa-warehouse"></i> Inventory</a></li>
+            <li><a id="show-form" onclick="showForm()"><i class="fa-solid fa-store"></i> Register Store</a></li>
+            <li>
+                <a href="{% url 'user_logout' %}" class="logout_button dropdown-item">
+                <i class="fa-solid fa-bed"></i> Logout</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="dashboard">
+        <p class="page">Stores</p>
+        <div class="container">
+            {% for store in stores %}
+                <div class="card">
+                    <h2>{{store.name}}</h2>
+                    <p>{{store.address}}</p>
+                    <a href="{% url 'stores_stock' store_id=store.id %}" class="view-store">View Store</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="hidden">
+        <div id="blurr"></div>
+        <form class="hidden_form" action="{% url 'create_store' %}" method="POST">
+            {% csrf_token %}
+            <h2 class="card_title">Register a new store</h2>
+
+            <h3>Store Name</h3>
+            {{form.name}}
+            <h3>Store Address</h3>
+            {{form.address}}
+            <button type="submit" class="create_btn form_btn">Create</button>
+            <button class="close_button" id="close" onclick="hidForm()">X</button>
+        </form>
+    </div>
+    <script defer>
+        const closeButton = document.getElementById('close')
+        const hidden = document.getElementById('hidden')
+        const blurr = document.getElementById('blurr')
+
+        function showForm(){
+            blurr.style.display = 'block'
+            hidden.style.display = 'block'            
+        }
+
+        function hidForm(){
+            blurr.style.display = 'none'
+            hidden.style.display = 'none'  
+        }
+    </script>
+</body>
+</html>

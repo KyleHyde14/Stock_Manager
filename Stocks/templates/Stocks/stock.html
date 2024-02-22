@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script src="https://kit.fontawesome.com/27011660c1.js" crossorigin="anonymous"></script>
+    <title>{{store.name}}'s Stock</title>
+</head>
+<body>
+    <nav id="navbar">
+        <h1 class="nav-title"><a href="/"><i class="fa-solid fa-box"></i> Stock Manager</a></h1>
+        <ul>
+            <li><a ><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
+            <li><a onclick="showForm()"><i class="fa-solid fa-circle-plus"></i> Add products</a></li>
+            <li>
+                <a href="{% url 'user_logout' %}" class="logout_button dropdown-item">
+                <i class="fa-solid fa-bed"></i> Logout</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="dashboard">
+        <p class="page">{{store.name}}'s Stock</p>
+        <div class="store-container">             
+            {% for product in stock.amount_of_product_set.all %}
+             <div class="store-product">
+                <h2>{{ product.product }}</h2>
+                <h4>Available: {{ product.quantity }} Units</h4>
+                <p id="description">{{product.product.description}}</p>
+                <p><strong>Price: </strong>{{product.product.price}}$</p>
+                <button type="button" id="add_to_cart" onclick="addToCart('{{product.product.id}}')">Add to cart</button>
+             </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="hidden">
+        <div id="blurr"></div>
+        <form class="hidden_form" action="{% url 'add_product' store_id=store.id %}" method="POST">
+            {% csrf_token %}
+            <h2 class="card_title">Add products to this store</h2>
+
+            <h3>Product</h3>
+            {{form.product}}
+            <h3>Quantity</h3>
+            {{form.quantity}}
+            <button type="submit" class="create_btn form_btn">Create</button>
+            <button class="close_button" id="close" onclick="hidForm()">X</button>
+        </form>
+    </div>
+    <script defer>
+
+        const closeButton = document.getElementById('close')
+        const hidden = document.getElementById('hidden')
+        const blurr = document.getElementById('blurr')
+
+        function showForm(){
+            blurr.style.display = 'block'
+            hidden.style.display = 'block'            
+        }
+
+        function hidForm(){
+            blurr.style.display = 'none'
+            hidden.style.display = 'none'  
+        }
+        async function addToCart(productId) {
+            const url = "{% url 'modify_cart' %}"
+            const body = JSON.stringify({
+                product_id: productId,
+                action: 'add'
+            });
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    action: 'add'
+                })
+            })
+
+            if (response.ok) {
+                const data = await response.json()
+                alert(JSON.stringify(data))
+            } else {
+                alert(response.status)
+            }
+        }    
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (const cookie of cookies) {
+                    const parts = cookie.split('=');
+                    const cookieName = parts[0].trim();
+                    if (cookieName === name){
+                        cookieValue = parts[1].trim();
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

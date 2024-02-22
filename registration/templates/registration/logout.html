@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout</title>
+    <link rel="stylesheet" href="{% static 'registration.css' %}">
+</head>
+<body>
+    <div class="card">
+        <h2>Thanks for using our stock manager to make your stores more efficient.
+            Your session is now closed. You can always <a href="{% url 'user_login' %}">log back in</a>
+            to make any neccesary changes.</h2>
+    </div>
+</body>
+</html>

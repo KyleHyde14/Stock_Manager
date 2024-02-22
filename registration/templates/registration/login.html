@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'registration.css' %}">
+</head>
+<body>
+    <div class="card">
+        <h1>Account login</h1>
+        <form action="{% url 'user_login' %}" method="POST">
+            {% csrf_token %}
+            {{form.username}}
+            {{form.password}}
+            <button type="submit">Login</button>
+            <h4>Do you need an account? <a href="{% url 'register' %}">Sign up</a></h4>
+        </form>
+        
+    </div>
+</body>
+</html>

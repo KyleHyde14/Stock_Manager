@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script src="https://kit.fontawesome.com/27011660c1.js" crossorigin="anonymous"></script>
+    <title>My Products</title>
+</head>
+<body>
+    <nav id="navbar">
+        <h1 class="nav-title"><a href="/"><i class="fa-solid fa-box"></i> Stock Manager</a></h1>
+        <ul>
+            <li><a id="show-form" onclick="showForm()"><i class="fa-solid fa-cloud-arrow-up"></i> Register products</a></li>
+            <li>
+                <a href="{% url 'user_logout' %}" class="logout_button dropdown-item">
+                <i class="fa-solid fa-bed"></i> Logout</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="dashboard">
+        <p class="page">Products</p>
+        <div class="container">
+            {% for product in products %}
+                <div class="card">
+                    <h2 class="product-name">{{product.name}}</h2>
+                    <p><strong>Price: </strong>{{product.price}} $</p>
+                    <p>Total Sales: 0</p>
+                </div>
+            {% endfor %} 
+        </div>
+    </div>
+    <div id="hidden">
+        <div id="blurr"></div>
+        <form class="product_hidden_form" action="{% url 'create_product' %}" method="POST">
+            {% csrf_token %}
+            <h2>Register a new product</h2>
+            <h3>Product Name</h3>
+            {{form.name}}
+            <h3>Price</h3>
+            {{form.price}}
+            <h3>Description</h3>
+            {{form.description}}
+            <div class="on_sale">On sale{{form.on_sale}}</div> 
+            <button type="submit" class="create_btn">Register</button>
+            <button class="close_button" id="close" onclick="hidForm()">X</button>
+        </form>
+    </div>
+    <script defer>
+        const closeButton = document.getElementById('close')
+        const hidden = document.getElementById('hidden')
+        const blurr = document.getElementById('blurr')
+
+        function showForm(){
+            blurr.style.display = 'block'
+            hidden.style.display = 'block'            
+        }
+
+        function hidForm(){
+            blurr.style.display = 'none'
+            hidden.style.display = 'none'  
+        }
+    </script>
+</body>
+</html>
