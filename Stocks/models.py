@@ -22,6 +22,7 @@ class product(models.Model):
     description = models.CharField(max_length=100)
     on_sale = models.BooleanField(default=False)
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=1)
+    sold = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -51,7 +52,7 @@ class amount_of_product(models.Model):
         return f'{self.product.name} -{self.stock.store}'
     
 class cart(models.Model):
-    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     active = models.BooleanField(default=False)
 
     def __str__(self):
@@ -60,14 +61,23 @@ class cart(models.Model):
 class cartItem(models.Model):
     cart = models.ForeignKey(cart, on_delete=models.CASCADE)
     product = models.ForeignKey(product, on_delete=models.CASCADE)
+    origin = models.ForeignKey(store, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
-    total = models.DecimalField(max_digits=6, decimal_places=2)
+    
+    @property
+    def total(self):
+        return self.quantity * self.unit_price
 
     def __str__(self):
-        return self.product
+        return self.product.name
 
 @receiver(post_save, sender=store)
 def create_stock(sender, instance, created, **kwargs):
     if created:
         stock.objects.create(store=instance)
+
+@receiver(post_save, sender=CustomUser)
+def create_stock(sender, instance, created, **kwargs):
+    if created:
+        cart.objects.create(user=instance)

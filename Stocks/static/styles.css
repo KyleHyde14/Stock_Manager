@@ -158,6 +158,19 @@ h2{
     font-size: 110%;
 }
 
+.disabled{
+    background-color: #ccc;
+    border: none;
+    color: #fff;
+    width: 100%;
+    padding: 2% 10%;
+    display: grid;
+    place-items: center;
+    height: fit-content;
+    border-radius: 5px;
+    font-size: 110%;
+}
+
 #description{
     margin: 1% 0;
     height: 20%;
@@ -278,5 +291,68 @@ form input, select{
     outline: 1px solid #ddd;
 }
 
+.disclaimer{
+    font-weight: bold;
+    max-height: 12%;
+    padding: 1.5% 20% 2% 3%; 
+    margin: 0;
+}
 
+.checkout-container{
+    display: grid;
+    place-items: center;
+    padding: 5%;
+}
 
+.checkout-box{
+    min-width: 60%;
+    width: fit-content;
+    max-width: 80%;
+    height: fit-content;
+    border-radius: 5px;
+    box-shadow: 1px 1px 6px #222;
+    padding: 2%;
+    margin: 3% 5%;
+    overflow: auto;
+}
+
+.origin-name{
+    background-color: #222;
+    color: #fff;
+    max-width: 80%;
+    margin: 0;
+    border-radius: inherit;
+    padding: 0.5% 1%;
+}
+
+.item{
+    display: grid;
+    height: fit-content;
+    margin: 2% 0;
+    width: 80%;
+    grid-template-columns: 3fr 1fr 1fr .5fr .5fr;
+    padding: 0 2%;
+}
+
+.minus, .trash{
+    font-weight: bold;
+    font-size: 1.3rem;
+    background-color: #fff;
+    border: none;
+}
+
+.trash{
+    color: #ED4337;
+}
+
+.simulate{
+    background-color: #222;
+    color: #fff;
+    border-radius: 5px;
+    display: grid;
+    height: 2.5rem;
+    font-size: 1.2rem;
+    place-items: center;
+    border: none;
+    padding: .5% 1%;
+}

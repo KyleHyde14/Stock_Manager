@@ -7,4 +7,3 @@ admin.site.register(stock)
 admin.site.register(amount_of_product)
 admin.site.register(cart)
 admin.site.register(cartItem)
-

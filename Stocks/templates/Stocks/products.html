@@ -12,6 +12,7 @@
     <nav id="navbar">
         <h1 class="nav-title"><a href="/"><i class="fa-solid fa-box"></i> Stock Manager</a></h1>
         <ul>
+            <li><a href="{% url 'checkout' %}"><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
             <li><a id="show-form" onclick="showForm()"><i class="fa-solid fa-cloud-arrow-up"></i> Register products</a></li>
             <li>
                 <a href="{% url 'user_logout' %}" class="logout_button dropdown-item">
@@ -26,7 +27,7 @@
                 <div class="card">
                     <h2 class="product-name">{{product.name}}</h2>
                     <p><strong>Price: </strong>{{product.price}} $</p>
-                    <p>Total Sales: 0</p>
+                    <p>Total Sales: {{product.sold}}</p>
                 </div>
             {% endfor %} 
         </div>

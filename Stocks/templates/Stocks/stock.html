@@ -12,7 +12,7 @@
     <nav id="navbar">
         <h1 class="nav-title"><a href="/"><i class="fa-solid fa-box"></i> Stock Manager</a></h1>
         <ul>
-            <li><a ><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
+            <li><a href="{% url 'checkout' %}"><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
             <li><a onclick="showForm()"><i class="fa-solid fa-circle-plus"></i> Add products</a></li>
             <li>
                 <a href="{% url 'user_logout' %}" class="logout_button dropdown-item">
@@ -29,7 +29,12 @@
                 <h4>Available: {{ product.quantity }} Units</h4>
                 <p id="description">{{product.product.description}}</p>
                 <p><strong>Price: </strong>{{product.product.price}}$</p>
+                {% if product.quantity < 1 %}
+                <button type="button" class="disabled">Coming soon</button>
+                {% else %}
                 <button type="button" id="add_to_cart" onclick="addToCart('{{product.product.id}}')">Add to cart</button>
+                {% endif %}
+
              </div>
             {% endfor %}
         </div>
@@ -66,7 +71,8 @@
         async function addToCart(productId) {
             const url = "{% url 'modify_cart' %}"
             const body = JSON.stringify({
-                product_id: productId,
+                productId: productId,
+                storeId: '{{store.id}}',
                 action: 'add'
             });
             const response = await fetch(url, {
@@ -75,17 +81,14 @@
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken'),
                 },
-                body: JSON.stringify({
-                    productId: productId,
-                    action: 'add'
-                })
+                body: body
             })
 
             if (response.ok) {
-                const data = await response.json()
-                alert(JSON.stringify(data))
+                const data = await response.json() 
+                alert(JSON.stringify(data['message']))
             } else {
-                alert(response.status)
+                alert('Ups, something went wrong. Error code: ' + response.status)
             }
         }    
         

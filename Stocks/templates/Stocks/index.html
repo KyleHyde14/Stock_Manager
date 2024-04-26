@@ -13,6 +13,7 @@
         <h1 class="nav-title"><a href="/"><i class="fa-solid fa-box"></i> Stock Manager</a></h1>
         <ul>
             <li><a href="{% url 'products' user_id=user.id %}"><i class="fa-solid fa-warehouse"></i> Inventory</a></li>
+            <li><a href="{% url 'checkout' %}"><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
             <li><a id="show-form" onclick="showForm()"><i class="fa-solid fa-store"></i> Register Store</a></li>
             <li>
                 <a href="{% url 'user_logout' %}" class="logout_button dropdown-item">

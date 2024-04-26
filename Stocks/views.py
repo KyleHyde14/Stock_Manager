@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import *
-from .models import store, product, stock
+from .models import store, product, cart, cartItem
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
@@ -85,11 +85,113 @@ def add_product(request, store_id):
     return redirect(f'/stock/{store_id}')
 
 @login_required
+def checkout(request):
+    userCart = cart.objects.get(user=request.user)
+    cartItems = cartItem.objects.filter(cart=userCart)
+    origins = set(x.origin for x in cartItems)
+    context = {
+        'cart': userCart,
+        'cartItems': cartItems,
+        'origins': origins
+    }
+    return render(request, 'Stocks/checkout.html', context)
+
+@login_required
 def modify_cart(request):
     if request.method == 'POST':
         data = json.loads(request.body)
+
         action = data['action']
-        productId = data['productId']
-        item = product.objects.get(id=productId)
-        print(action, item.name)
-        return JsonResponse({'success': True, 'message': f'{item.name} added to cart'})
+
+
+        if action == 'add':
+            productId = data['productId']
+            storeId = data['storeId']
+            item = product.objects.get(id=productId)
+            itemOrigin = store.objects.get(id=storeId)
+
+            currentCart = cart.objects.get(user=request.user)
+            currentCart.active = True
+            try:
+                newItem = cartItem.objects.get(cart=currentCart, product=item.id, origin=itemOrigin)
+            except:
+                newItem = None
+            if not newItem:
+                newItem = cartItem.objects.create(
+                    cart = currentCart,
+                    product = item,
+                    quantity = 1,
+                    unit_price = item.price,
+                    origin = itemOrigin
+                )
+            else:
+                if newItem.quantity >= 3:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'You can add up to a maximum of 3 units of every product per store.'
+                    })
+                newItem.quantity += 1
+                newItem.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'{newItem} from {newItem.origin} was added to cart, total in cart is {newItem.quantity} {newItem.total}'
+            })
+
+        elif action == 'remove':
+            cartItemId = data['cartItemId']
+            try:
+                item_to_remove = cartItem.objects.get(id=cartItemId)
+            except:
+                return JsonResponse({'success': False})
+            if item_to_remove.quantity <= 1:
+                item_to_remove.delete()
+                return JsonResponse({
+                'success': True,
+                'message': f'{item_to_remove} from {item_to_remove.origin} is no longer in your cart'
+                })
+            
+            item_to_remove.quantity -= 1
+            item_to_remove.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'1 unit of {item_to_remove} from {item_to_remove.origin} was removed from your cart'
+            })
+        
+        elif action == 'delete':
+            cartItemId = data['cartItemId']
+            
+            try:
+                item_to_remove = cartItem.objects.get(id=cartItemId)
+                item_to_remove.delete()
+                return JsonResponse({
+                'success': True,
+                'message': f'all units of {item_to_remove} from {item_to_remove.origin} were removed of the cart'
+                })
+            except:
+                return JsonResponse({'success': False})
+                
+@login_required
+def simulate_purchase(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        cartId = data['cartId']
+
+        cart_to_purchase = cart.objects.get(id=cartId)
+
+        items = cartItem.objects.filter(cart=cart_to_purchase)
+
+        for x in items:
+            storeItem = amount_of_product.objects.get(product=x.product, stock=x.origin.stock)
+            globalItem = product.objects.get(id=x.product.id)
+            storeItem.quantity -= x.quantity
+            globalItem.sold += x.quantity
+            storeItem.save()
+            globalItem.save()
+            x.delete()
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Purchase simulated correctly! all the items were removed from their respective stores.'
+        })
